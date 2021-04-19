@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "204832348551",
+    "firebase_url": "https://unicornattendance-default-rtdb.firebaseio.com",
+    "project_id": "unicornattendance",
+    "storage_bucket": "unicornattendance.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:204832348551:android:33278a0fedd9cd53b59b22",
+        "android_client_info": {
+          "package_name": "com.aditya.unicornattendance"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "204832348551-sv64t7cqdt6t7p601rhcp4s04cajnghv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAC1yk5U6lafgn3abV68vKj2zDAe6wdag0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "204832348551-sv64t7cqdt6t7p601rhcp4s04cajnghv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

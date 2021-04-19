@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/close"
+        android:layout_gravity="right"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp"
+        android:gravity="center_horizontal"
+        android:background="@drawable/rounded_bg">
+
+        <TextView
+            android:id="@+id/toplabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Employee"
+            android:fontFamily="@font/nexa_bold"
+            android:textSize="18dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Name"
+            android:fontFamily="@font/nexa_bold"
+            android:layout_marginTop="20dp"/>
+
+        <EditText
+            android:id="@+id/empname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nexa_light"
+            android:hint="Employee Name"
+            android:gravity="center_horizontal"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Code"
+            android:fontFamily="@font/nexa_bold"
+            android:layout_marginTop="20dp"/>
+
+        <EditText
+            android:id="@+id/empcode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nexa_light"
+            android:hint="Employee Code"
+            android:gravity="center_horizontal"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Designation"
+            android:fontFamily="@font/nexa_bold"
+            android:layout_marginTop="20dp"/>
+
+        <EditText
+            android:id="@+id/empdesig"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nexa_light"
+            android:hint="Employee Designation"
+            android:gravity="center_horizontal"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Work Hours"
+            android:fontFamily="@font/nexa_bold"
+            android:layout_marginTop="20dp"/>
+
+        <EditText
+            android:id="@+id/emphour"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nexa_light"
+            android:hint="Work Hours"
+            android:inputType="number"
+            android:gravity="center_horizontal"/>
+
+        <TextView
+            android:id="@+id/save"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SAVE"
+            android:fontFamily="@font/nexa_bold"
+            android:textColor="@color/white"
+            android:background="@drawable/rounded_btn"
+            android:gravity="center_horizontal"
+            android:padding="10dp"
+            android:elevation="10dp"
+            android:layout_margin="20dp"/>
+    </LinearLayout>
+
+</LinearLayout>

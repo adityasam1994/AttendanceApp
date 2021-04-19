@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <ImageView
+        android:id="@+id/close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:src="@drawable/close" />
+
+    <LinearLayout
+        android:id="@+id/btnlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_bg"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/history"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="History"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_btn"
+            android:fontFamily="@font/nexa_bold"
+            android:textColor="@color/white"
+            android:textSize="20dp"
+            android:padding="10dp"
+            android:layout_margin="10dp"
+            android:gravity="center_horizontal"/>
+
+        <TextView
+            android:id="@+id/addleave"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Add Leave"
+            android:layout_weight="1"
+            android:background="@drawable/roundedbtntransit"
+            android:fontFamily="@font/nexa_bold"
+            android:textColor="@color/white"
+            android:textSize="20dp"
+            android:padding="10dp"
+            android:layout_margin="10dp"
+            android:gravity="center_horizontal"/>
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/leavelist"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:background="@drawable/rounded_bg"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/leavelinear"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:fontFamily="@font/nexa_bold"
+                android:textSize="18dp"
+                android:text="No leaves in the database"/>
+        </LinearLayout>
+
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/addlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_bg"
+        android:gravity="center_horizontal"
+        android:visibility="gone"
+        android:orientation="vertical"
+        android:padding="15dp">
+
+        <TextView
+            android:id="@+id/label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:fontFamily="@font/nexa_bold"
+            android:text="Leave"
+            android:textSize="16dp" />
+
+        <TextView
+            android:id="@+id/empname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nexa_bold"
+            android:text="Employee Name : UEM 262"
+            android:textColor="#1900FF"
+            android:textSize="20dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/leave"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_bg_active"
+                android:fontFamily="@font/nexa_bold"
+                android:gravity="center_horizontal"
+                android:padding="5dp"
+                android:text="One Day Leave"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/vacation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_bg_inactive"
+                android:fontFamily="@font/nexa_bold"
+                android:gravity="center_horizontal"
+                android:padding="5dp"
+                android:text="Vacation"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/leavelayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/nexa_bold"
+                android:text="Date"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/onedate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/underline"
+                android:fontFamily="@font/nexa_light"
+                android:gravity="center_horizontal"
+                android:hint="DD/MM/YYYY"
+                android:textColor="#005046"
+                android:textSize="18dp" />
+
+            <TextView
+                android:id="@+id/onesave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/roundedbtntransit"
+                android:fontFamily="@font/nexa_bold"
+                android:paddingLeft="20dp"
+                android:paddingTop="10dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="10dp"
+                android:text="SAVE"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/vacationlayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/nexa_bold"
+                android:text="From Date"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/fromdate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/underline"
+                android:fontFamily="@font/nexa_light"
+                android:gravity="center_horizontal"
+                android:hint="DD/MM/YYYY"
+                android:textColor="#005046"
+                android:textSize="18dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/nexa_bold"
+                android:text="To Date"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/todate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/underline"
+                android:fontFamily="@font/nexa_light"
+                android:gravity="center_horizontal"
+                android:hint="DD/MM/YYYY"
+                android:textColor="#005046"
+                android:textSize="18dp" />
+
+            <TextView
+                android:id="@+id/vacsave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/roundedbtntransit"
+                android:fontFamily="@font/nexa_bold"
+                android:paddingLeft="20dp"
+                android:paddingTop="10dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="10dp"
+                android:text="SAVE"
+                android:textColor="@color/white" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

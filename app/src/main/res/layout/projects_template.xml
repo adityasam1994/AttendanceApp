@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="horizontal">
+
+    <!--                    Card 1-->
+
+    <LinearLayout
+        android:id="@+id/ll1"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/rounded_bg"
+        android:elevation="10dp"
+        android:orientation="vertical"
+        android:paddingLeft="10dp"
+        android:paddingTop="20dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="20dp">
+
+        <TextView
+            android:id="@+id/projectname1"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:fontFamily="@font/nexa_bold"
+            android:gravity="center_horizontal"
+            android:letterSpacing="0.05"
+            android:lineSpacingExtra="5dp"
+            android:text="ZAHIA CENTER POINT"
+            android:textSize="14dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/projectcode1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:fontFamily="@font/nexa_bold"
+            android:text="J1332"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!--                    Card 2-->
+
+    <LinearLayout
+        android:id="@+id/ll2"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/rounded_bg"
+        android:elevation="10dp"
+        android:orientation="vertical"
+        android:paddingLeft="10dp"
+        android:paddingTop="20dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="20dp">
+
+        <TextView
+            android:id="@+id/projectname2"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:fontFamily="@font/nexa_bold"
+            android:gravity="center_horizontal"
+            android:letterSpacing="0.05"
+            android:lineSpacingExtra="5dp"
+            android:text="FITNESS FIRST"
+            android:textSize="14dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/projectcode2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:fontFamily="@font/nexa_bold"
+            android:text="J1332"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</LinearLayout>
