@@ -27,6 +27,15 @@
                 android:fontFamily="@font/nexa_bold"
                 android:textSize="18dp"/>
 
+            <ImageView
+                android:id="@+id/vacicon"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:visibility="gone"
+                android:layout_gravity="center"
+                android:src="@drawable/vacation"
+                android:layout_marginRight="10dp"/>
+
             <TextView
                 android:id="@+id/empcode"
                 android:layout_width="wrap_content"

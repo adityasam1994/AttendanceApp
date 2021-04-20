@@ -31,9 +31,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.kaopiz.kprogresshud.KProgressHUD;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 public class vacations extends AppCompatActivity {
 
@@ -46,6 +50,7 @@ public class vacations extends AppCompatActivity {
     String datename = "oneday";
 
     DataSnapshot allleaves = null;
+    KProgressHUD khud;
 
     Calendar c;
     DatePickerDialog datePickerDialog;
@@ -59,7 +64,15 @@ public class vacations extends AppCompatActivity {
 
         getSupportActionBar().hide();
 
-        getemployees();
+        khud=KProgressHUD.create(vacations.this)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setCancellable(true)
+                .setAnimationSpeed(2)
+                .setDimAmount(0.5f);
+
+        khud.show();
+
+        getleaves();
 
         addempbtn = (TextView) findViewById(R.id.addemp);
         cardcontainer = (LinearLayout) findViewById(R.id.empcontainer);
@@ -112,7 +125,7 @@ public class vacations extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 allleaves = snapshot;
-                createcards();
+                getemployees();
             }
 
             @Override
@@ -136,6 +149,12 @@ public class vacations extends AppCompatActivity {
 
                 TextView code = ll.findViewById(R.id.empcode);
                 code.setText(ds.getKey().toString());
+
+                ImageView vacicon = ll.findViewById(R.id.vacicon);
+
+                if (checkifonleave(ds.getKey().toString())) {
+                    vacicon.setVisibility(View.VISIBLE);
+                }
 
                 ll.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -178,9 +197,10 @@ public class vacations extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void aVoid) {
                         dialog.dismiss();
-                        Intent intent = getIntent();
-                        finish();
-                        startActivity(intent);
+//                        Intent intent = getIntent();
+//                        finish();
+//                        startActivity(intent);
+                        getleaves();
                         Toast.makeText(vacations.this, "Saved", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -193,7 +213,7 @@ public class vacations extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 emps = snapshot;
-                getleaves();
+                createcards();
             }
 
             @Override
@@ -201,6 +221,82 @@ public class vacations extends AppCompatActivity {
 
             }
         });
+    }
+
+    private String gettime(int len) {
+        Calendar instance = Calendar.getInstance();
+
+        int mod = instance.get(Calendar.MINUTE) % 15;
+        instance.add(Calendar.MINUTE, mod < 8 ? -mod : (15 - mod));
+
+        String year = String.valueOf(instance.get(Calendar.YEAR));
+        String month = String.valueOf(instance.get(Calendar.MONTH) + 1);
+        String day = String.valueOf(instance.get(Calendar.DATE));
+        String hour = String.valueOf(instance.get(Calendar.HOUR_OF_DAY));
+        String minute = String.valueOf(instance.get(Calendar.MINUTE));
+
+        if (month.length() == 1) {
+            month = "0" + month;
+        }
+        if (day.length() == 1) {
+            day = "0" + day;
+        }
+        if (hour.length() == 1) {
+            hour = "0" + hour;
+        }
+        if (minute.length() == 1) {
+            minute = "0" + minute;
+        }
+
+        if (len == 1) {
+            return day + "/" + month + "/" + year + " " + hour + ":" + minute + ":00";
+        } else {
+            return year + month + day;
+        }
+    }
+
+    private boolean checkifonleave(String ec) {
+        boolean ch = false;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        Date cd = null;
+        try {
+            cd = dateFormat.parse(gettime(0));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if (cd != null) {
+            for (DataSnapshot ds : allleaves.getChildren()) {
+                if (ds.getKey().toString().equals(ec)) {
+                    for (DataSnapshot ddd : ds.getChildren()) {
+                        String fd = ddd.child("fromdate").getValue().toString();
+                        String td = ddd.child("todate").getKey().toString();
+                        Date fdd = null, tdd = null;
+                        try {
+                            fdd = dateFormat.parse(fd);
+
+                            if (td.length() > 2) {
+                                tdd = dateFormat.parse(td);
+                            }
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
+                        if (fdd != null && tdd != null) {
+                            if ((cd.after(fdd) || cd.compareTo(fdd) == 0) && (cd.before(tdd) || cd.compareTo(tdd) == 0)) {
+                                ch = true;
+                            }
+                        } else if (fdd != null && tdd == null) {
+                            if (cd.compareTo(fdd) == 0) {
+                                ch = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return ch;
     }
 
     private void createcards() {
@@ -217,6 +313,12 @@ public class vacations extends AppCompatActivity {
                 TextView code = ll.findViewById(R.id.empcode);
                 code.setText(ds.getKey().toString());
 
+                ImageView vacicon = ll.findViewById(R.id.vacicon);
+
+                if (checkifonleave(ds.getKey().toString())) {
+                    vacicon.setVisibility(View.VISIBLE);
+                }
+
                 ll.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -226,6 +328,8 @@ public class vacations extends AppCompatActivity {
                 });
             }
         }
+
+        khud.dismiss();
     }
 
     private void optionpop(DataSnapshot emp){
@@ -564,6 +668,7 @@ public class vacations extends AppCompatActivity {
         onesave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                khud.show();
                 saveleave(onedate.getText().toString(), "","leave", emp.getKey().toString(), dialog);
             }
         });
@@ -571,6 +676,7 @@ public class vacations extends AppCompatActivity {
         vacsave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                khud.show();
                 saveleave(fromdate.getText().toString(), todate.getText().toString(),"vacation", emp.getKey().toString(), dialog);
             }
         });
@@ -600,11 +706,13 @@ public class vacations extends AppCompatActivity {
         dbrleave.child(ec).child(fc).setValue(vs).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+                khud.dismiss();
                 dialog.dismiss();
                 Toast.makeText(vacations.this, "Saved", Toast.LENGTH_SHORT).show();
-                Intent intent = getIntent();
-                finish();
-                startActivity(intent);
+//                Intent intent = getIntent();
+//                finish();
+//                startActivity(intent);
+                getleaves();
             }
         });
     }

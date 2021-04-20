@@ -24,6 +24,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.kaopiz.kprogresshud.KProgressHUD;
 
 import java.util.ArrayList;
 
@@ -39,12 +40,22 @@ public class Manage_projects extends AppCompatActivity {
     EditText editsearch;
     ImageView backbtn;
 
+    KProgressHUD khud;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_projects);
 
         getSupportActionBar().hide();
+
+        khud=KProgressHUD.create(Manage_projects.this)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setCancellable(true)
+                .setAnimationSpeed(2)
+                .setDimAmount(0.5f);
+
+        khud.show();
 
         getprojects();
 
@@ -171,9 +182,10 @@ public class Manage_projects extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void aVoid) {
                         dialog.dismiss();
-                        Intent intent = getIntent();
-                        finish();
-                        startActivity(intent);
+//                        Intent intent = getIntent();
+//                        finish();
+//                        startActivity(intent);
+                        getprojects();
                         Toast.makeText(Manage_projects.this, "Saved", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -233,6 +245,8 @@ public class Manage_projects extends AppCompatActivity {
                 });
             }
         }
+
+        khud.dismiss();
     }
 
     private void EmpPop(DataSnapshot emp, String type) {
@@ -282,9 +296,10 @@ public class Manage_projects extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void aVoid) {
                         dialog.dismiss();
-                        Intent intent = getIntent();
-                        finish();
-                        startActivity(intent);
+//                        Intent intent = getIntent();
+//                        finish();
+//                        startActivity(intent);
+                        getprojects();
                         Toast.makeText(Manage_projects.this, "Saved", Toast.LENGTH_SHORT).show();
                     }
                 });

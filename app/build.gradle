@@ -39,6 +39,7 @@ dependencies {
     implementation 'com.google.zxing:core:3.2.1'
     implementation 'com.journeyapps:zxing-android-embedded:3.2.0@aar'
     implementation 'com.opencsv:opencsv:5.3'
+    implementation 'com.kaopiz:kprogresshud:1.2.0'
     implementation files('libs\\poi-3.7.jar')
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

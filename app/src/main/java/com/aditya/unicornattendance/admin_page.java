@@ -24,6 +24,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.kaopiz.kprogresshud.KProgressHUD;
 import com.opencsv.CSVWriter;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -48,6 +49,7 @@ public class admin_page extends AppCompatActivity {
     TextView getatt, manageemp, manageproj, managevac;
     SharedPreferences sharedPreferences;
     ArrayList<DataSnapshot> attdata = new ArrayList<>();
+    KProgressHUD khud;
     DatabaseReference dbr = FirebaseDatabase.getInstance().getReference("Attendance");
     DatabaseReference dbremp = FirebaseDatabase.getInstance().getReference("Employees");
 
@@ -59,6 +61,13 @@ public class admin_page extends AppCompatActivity {
         setContentView(R.layout.activity_admin_page);
 
         getSupportActionBar().hide();
+
+        khud=KProgressHUD.create(admin_page.this)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setCancellable(true)
+                .setAnimationSpeed(2)
+                .setDimAmount(0.5f);
+        khud.show();
 
         checkstorage();
         getemployees();
@@ -115,6 +124,7 @@ public class admin_page extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot d : snapshot.getChildren()) {
                     empdata.add(d);
+                    khud.dismiss();
                 }
             }
 
@@ -156,6 +166,7 @@ public class admin_page extends AppCompatActivity {
         dialogFragment.setOnDateSetListener(new MonthYearPickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(int year, int monthOfYear) {
+                khud.show();
                 loaddata(year, monthOfYear);
             }
         });
@@ -291,7 +302,7 @@ public class admin_page extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        khud.dismiss();
         Toast.makeText(this, "File created", Toast.LENGTH_SHORT).show();
     }
 
