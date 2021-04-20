@@ -87,7 +87,7 @@ public class Manage_projects extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String st = editsearch.getText().toString().trim().toLowerCase();
+                String st = s.toString().toLowerCase();
                 ArrayList<DataSnapshot> temp = new ArrayList<>();
                 for (DataSnapshot emp : projData) {
                     if (emp.child("name").getValue().toString().toLowerCase().contains(st) || emp.getKey().toString().toLowerCase().contains(st)) {
@@ -115,7 +115,7 @@ public class Manage_projects extends AppCompatActivity {
 
     private void createSearchCards(ArrayList<DataSnapshot> temp) {
         container.removeAllViews();
-        if (temp.size() != 0) {
+        if (temp.size() > 0) {
             noresult.setVisibility(View.GONE);
             for (DataSnapshot ds : temp) {
                 LayoutInflater inflater = LayoutInflater.from(Manage_projects.this);
@@ -209,6 +209,8 @@ public class Manage_projects extends AppCompatActivity {
                         temp.add(ds);
                     }
                 }
+
+                projData=temp;
                 createcards(temp);
             }
 

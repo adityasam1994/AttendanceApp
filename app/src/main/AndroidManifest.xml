@@ -16,12 +16,16 @@
         android:roundIcon="@mipmap/unicornlogo_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.UnicornAttendance">
-        <activity android:name=".vacations"
-            android:windowSoftInputMode="stateHidden"></activity>
-        <activity android:name=".Manage_projects"
-            android:windowSoftInputMode="stateHidden"/>
-        <activity android:name=".AllEmployeesPage"
-            android:windowSoftInputMode="stateHidden"/>
+        <activity android:name=".leave_history"></activity>
+        <activity
+            android:name=".vacations"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".Manage_projects"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".AllEmployeesPage"
+            android:windowSoftInputMode="stateHidden" />
         <activity android:name=".admin_page" />
         <activity android:name=".loginpage" />
         <activity android:name=".splashscreen">
