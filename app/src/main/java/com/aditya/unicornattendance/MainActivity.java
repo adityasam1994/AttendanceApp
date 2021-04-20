@@ -35,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     ImageView logout;
     SharedPreferences sharedPreferences;
 
+    KProgressHUD khud;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,22 +44,30 @@ public class MainActivity extends AppCompatActivity {
 
         getSupportActionBar().hide();
 
-        sharedPreferences = getSharedPreferences("user",MODE_PRIVATE);
+        khud = KProgressHUD.create(MainActivity.this)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setCancellable(true)
+                .setAnimationSpeed(2)
+                .setDimAmount(0.5f);
+
+        khud.show();
+
+        sharedPreferences = getSharedPreferences("user", MODE_PRIVATE);
         cardcontainer = (LinearLayout) findViewById(R.id.cardcontainer);
-        logout = (ImageView)findViewById(R.id.logout);
+        logout = (ImageView) findViewById(R.id.logout);
 
         retireve_projects();
 
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean t = sharedPreferences.edit().putString("username","").commit();
-                if(t) {
+                boolean t = sharedPreferences.edit().putString("username", "").commit();
+                if (t) {
                     startActivity(new Intent(MainActivity.this, loginpage.class));
                 }
             }
         });
-        
+
     }
 
     @Override
@@ -71,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot db : snapshot.getChildren()) {
-                    if(db.child("status").getValue().toString().equals("active")) {
+                    if (db.child("status").getValue().toString().equals("active")) {
                         temp.add(db);
                     }
                 }
@@ -85,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void ask_pass(String pass, String code){
+    private void ask_pass(String pass, String code) {
         Dialog dialog = new Dialog(MainActivity.this);
         dialog.setContentView(R.layout.project_pop);
         dialog.show();
@@ -98,17 +108,26 @@ public class MainActivity extends AppCompatActivity {
         EditText editpass = dialog.findViewById(R.id.password);
         TextView proceed = dialog.findViewById(R.id.proceed_btn);
 
+        ImageView close = dialog.findViewById(R.id.close);
+
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String passenter = editpass.getText().toString().trim();
-                if(passenter.equals(pass)){
+                if (passenter.equals(pass)) {
                     dialog.dismiss();
                     Intent i = new Intent(MainActivity.this, option_page.class);
                     i.putExtra("pcode", code);
                     startActivity(i);
 
-                }else {
+                } else {
                     editpass.setText("");
                     Toast.makeText(MainActivity.this, "Wrong password", Toast.LENGTH_SHORT).show();
                 }
@@ -116,8 +135,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void create_project_cards(DataSnapshot proj,DataSnapshot proj1, int count){
-        if(count == 2) {
+    private void create_project_cards(DataSnapshot proj, DataSnapshot proj1, int count) {
+        if (count == 2) {
             LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
             LinearLayout ll = (LinearLayout) inflater.inflate(R.layout.projects_template, null, false);
             cardcontainer.addView(ll);
@@ -150,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
                     ask_pass(proj1.child("password").getValue().toString(), proj1.getKey().toString());
                 }
             });
-        }else{
+        } else {
             LayoutInflater inflaterz = LayoutInflater.from(MainActivity.this);
             LinearLayout llz = (LinearLayout) inflaterz.inflate(R.layout.projects_template, null, false);
             cardcontainer.addView(llz);
@@ -183,8 +202,8 @@ public class MainActivity extends AppCompatActivity {
 
                 create_project_cards(proj, proj1, 2);
             }
-        }else {
-            for (int i = 0; i < (temp.size()-1) / 2; i++) {
+        } else {
+            for (int i = 0; i < (temp.size() - 1) / 2; i++) {
                 DataSnapshot proj = temp.get(2 * i);
                 DataSnapshot proj1 = temp.get(2 * i + 1);
 
@@ -192,9 +211,11 @@ public class MainActivity extends AppCompatActivity {
 
             }
 
-            DataSnapshot projz = temp.get(temp.size()-1);
-            create_project_cards(projz, projz,1);
+            DataSnapshot projz = temp.get(temp.size() - 1);
+            create_project_cards(projz, projz, 1);
         }
+
+        khud.dismiss();
 
     }
 }

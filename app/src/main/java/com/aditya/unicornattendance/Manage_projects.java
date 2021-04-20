@@ -198,17 +198,18 @@ public class Manage_projects extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 projs = snapshot;
+                ArrayList<DataSnapshot> temp = new ArrayList<>();
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     if (ds.child("status").getValue().toString().equals("active")) {
-                        projData.add(ds);
+                        temp.add(ds);
                     }
                 }
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     if (ds.child("status").getValue().toString().equals("inactive")) {
-                        projData.add(ds);
+                        temp.add(ds);
                     }
                 }
-                createcards();
+                createcards(temp);
             }
 
             @Override
@@ -218,10 +219,11 @@ public class Manage_projects extends AppCompatActivity {
         });
     }
 
-    private void createcards() {
+    private void createcards(ArrayList<DataSnapshot> temp) {
         container.removeAllViews();
-        if (projData != null) {
-            for (DataSnapshot ds : projData) {
+
+        if (temp.size() > 0) {
+            for (DataSnapshot ds : temp) {
                 LayoutInflater inflater = LayoutInflater.from(Manage_projects.this);
                 LinearLayout ll;
                 if (ds.child("status").getValue().toString().equals("active")) {

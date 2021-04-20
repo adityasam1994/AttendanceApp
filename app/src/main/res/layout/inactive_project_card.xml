@@ -24,8 +24,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="ZAHIA CENTER POINT"
-                android:fontFamily="@font/nexa_bold"
-                android:textSize="18dp"/>
+                android:fontFamily="@font/nexa_bold"/>
 
             <TextView
                 android:id="@+id/projcode"
@@ -33,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:text="J1332"
                 android:fontFamily="@font/nexa_light"
-                android:textSize="20dp"/>
+                android:textSize="18dp"/>
         </LinearLayout>
     </LinearLayout>
 

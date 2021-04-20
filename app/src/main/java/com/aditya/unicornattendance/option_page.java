@@ -33,6 +33,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.kaopiz.kprogresshud.KProgressHUD;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ public class option_page extends AppCompatActivity {
 
     ImageView backbtn;
 
+    KProgressHUD khud;
 
     String action = "IN";
 
@@ -68,13 +70,21 @@ public class option_page extends AppCompatActivity {
         setContentView(R.layout.activity_option_page);
         getSupportActionBar().hide();
 
+        khud = KProgressHUD.create(option_page.this)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setCancellable(true)
+                .setAnimationSpeed(2)
+                .setDimAmount(0.5f);
+
+        khud.show();
+
         sharedPreferences = getSharedPreferences("user", MODE_PRIVATE);
 
         checkcamera();
         getprojects();
-        getemployees();
-        getsups();
-        gettodaysdata();
+        //getemployees();
+        //getsups();
+        //gettodaysdata();
 
         intime = (TextView) findViewById(R.id.intime);
         transout = (TextView) findViewById(R.id.tranout);
@@ -95,7 +105,7 @@ public class option_page extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 action = "IN";
-                startscanner();
+                checkcamera();
             }
         });
 
@@ -103,7 +113,7 @@ public class option_page extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 action = "TRANSOUT";
-                startscanner();
+                checkcamera();
             }
         });
 
@@ -111,7 +121,7 @@ public class option_page extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 action = "OUT";
-                startscanner();
+                checkcamera();
             }
         });
 
@@ -119,7 +129,7 @@ public class option_page extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 action = "TRANSIN";
-                startscanner();
+                checkcamera();
             }
         });
     }
@@ -133,6 +143,8 @@ public class option_page extends AppCompatActivity {
                         todaysData = ds;
                     }
                 }
+
+                khud.dismiss();
             }
 
             @Override
@@ -149,6 +161,7 @@ public class option_page extends AppCompatActivity {
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     supdata.add(ds);
                 }
+                gettodaysdata();
             }
 
             @Override
@@ -165,6 +178,7 @@ public class option_page extends AppCompatActivity {
                 for (DataSnapshot d : snapshot.getChildren()) {
                     empdata.add(d);
                 }
+                getsups();
             }
 
             @Override
@@ -181,6 +195,7 @@ public class option_page extends AppCompatActivity {
                 for (DataSnapshot db : snapshot.getChildren()) {
                     projectsdata.add(db);
                 }
+                getemployees();
             }
 
             @Override
@@ -194,6 +209,8 @@ public class option_page extends AppCompatActivity {
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             String[] requestloc = new String[]{Manifest.permission.CAMERA};
             requestPermissions(requestloc, REQUEST_LOC_ORDER);
+        }else {
+            startscanner();
         }
     }
 
@@ -241,6 +258,7 @@ public class option_page extends AppCompatActivity {
     }
 
     private void mark_out(String ec) {
+        khud.show();
         String tm = gettime(1);
         DataSnapshot empstatus = getstatus(ec);
         if (empstatus.hasChild("CURRENT_STATUS")) {
@@ -275,9 +293,12 @@ public class option_page extends AppCompatActivity {
             alertpop(msg);
         }
 
+        khud.dismiss();
+
     }
 
     private void mark_transin(String ec) {
+        khud.show();
         String tm = gettime(1);
         DataSnapshot empstatus = getstatus(ec);
 
@@ -314,9 +335,12 @@ public class option_page extends AppCompatActivity {
             String msg = getempname(ec) + " (" + ec + ") has not signed in yet hence cannot be taken in";
             alertpop(msg);
         }
+
+        khud.dismiss();
     }
 
     private void mark_transout(String ec) {
+        khud.show();
         String tm = gettime(1);
         DataSnapshot empstatus = getstatus(ec);
 
@@ -358,6 +382,8 @@ public class option_page extends AppCompatActivity {
             String msg = getempname(ec) + " (" + ec + ") has not signed in. First sign in to transit out";
             alertpop(msg);
         }
+
+        khud.dismiss();
     }
 
     private String getprojname_new(String code) {
@@ -372,6 +398,7 @@ public class option_page extends AppCompatActivity {
     }
 
     private void createdonedialog(String ec, String tm) {
+        khud.dismiss();
         Dialog dialog = new Dialog(option_page.this);
         dialog.setContentView(R.layout.att_success);
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -442,6 +469,7 @@ public class option_page extends AppCompatActivity {
     }
 
     private void mark_attendance(String ec) {
+        khud.show();
         String tm = gettime(1);
         DataSnapshot empstatus = getstatus(ec);
 
@@ -496,9 +524,12 @@ public class option_page extends AppCompatActivity {
                 alertpop(msg);
             }
         }
+
+        khud.dismiss();
     }
 
     private void alertpop(String msgs) {
+        khud.dismiss();
         Dialog dialog = new Dialog(option_page.this);
         dialog.setContentView(R.layout.alreadyin_pop);
         dialog.show();
