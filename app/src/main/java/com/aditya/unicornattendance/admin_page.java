@@ -66,9 +66,9 @@ public class admin_page extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("user", MODE_PRIVATE);
         logout = (ImageView) findViewById(R.id.logoutadmin);
         getatt = (TextView) findViewById(R.id.getatt);
-        manageemp = (TextView)findViewById(R.id.manageemp);
-        manageproj = (TextView)findViewById(R.id.manageproj);
-        managevac = (TextView)findViewById(R.id.managevac);
+        manageemp = (TextView) findViewById(R.id.manageemp);
+        manageproj = (TextView) findViewById(R.id.manageproj);
+        managevac = (TextView) findViewById(R.id.managevac);
 
         managevac.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,21 +161,21 @@ public class admin_page extends AppCompatActivity {
         });
     }
 
-    private void loaddata(int year, int month){
+    private void loaddata(int year, int month) {
         dbr.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                String m = String.valueOf(month+1);
-                if(m.length() == 1){
-                    m="0"+m;
+                String m = String.valueOf(month + 1);
+                if (m.length() == 1) {
+                    m = "0" + m;
                 }
-                String match = String.valueOf(year)+m;
-                for(DataSnapshot ds:snapshot.getChildren()){
-                    if(ds.getKey().toString().contains(match)) {
+                String match = String.valueOf(year) + m;
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    if (ds.getKey().toString().contains(match)) {
                         attdata.add(ds);
                     }
                 }
-                createfileExcel(String.valueOf(year),m);
+                createfileExcel(String.valueOf(year), m);
             }
 
             @Override
@@ -185,20 +185,20 @@ public class admin_page extends AppCompatActivity {
         });
     }
 
-    private void createfileExcel(String year, String month){
-        String fname = "Attendance_"+year+month;
-        File filePath = new File(getExternalFilesDir(null) + "/"+fname+".xls");
+    private void createfileExcel(String year, String month) {
+        String fname = "Attendance_" + year + month;
+        File filePath = new File(getExternalFilesDir(null) + "/" + fname + ".xls");
 
-        String[] months = new String[]{"Jan", "Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+        String[] months = new String[]{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
         HSSFWorkbook hssfWorkbook = new HSSFWorkbook();
 
         int rn = 0;
         List<String[]> data = new ArrayList<String[]>();
-        for(DataSnapshot att: attdata){
-            int c=0;
+        for (DataSnapshot att : attdata) {
+            int c = 0;
             HSSFSheet hssfSheet = hssfWorkbook.createSheet(att.getKey().toString());
-            data.add(new String[]{"S.No.", "Employee Name","Employee Code","In Time","Out Time"});
+            data.add(new String[]{"S.No.", "Employee Name", "Employee Code", "In Time", "Out Time"});
 
             HSSFRow hssfRowHead = hssfSheet.createRow(0);
             HSSFCell hssfCell00 = hssfRowHead.createCell(0);
@@ -216,13 +216,13 @@ public class admin_page extends AppCompatActivity {
             HSSFCell hssfCell44 = hssfRowHead.createCell(4);
             hssfCell44.setCellValue("Out Time");
 
-            int c1=0;
+            int c1 = 0;
 
-            for(DataSnapshot empds: empdata){
+            for (DataSnapshot empds : empdata) {
                 c1++;
                 HSSFRow hssfRow = hssfSheet.createRow(c1);
                 String empid = empds.getKey().toString();
-                if(att.hasChild(empid)){
+                if (att.hasChild(empid)) {
                     HSSFCell hssfCell1 = hssfRow.createCell(1);
                     hssfCell1.setCellValue(getempname(empid));
 
@@ -232,15 +232,14 @@ public class admin_page extends AppCompatActivity {
                     HSSFCell hssfCell3 = hssfRow.createCell(3);
                     hssfCell3.setCellValue(att.child(empid).child("IN").child("in_time").getValue().toString());
 
-                    if(att.child(empid).hasChild("OUT")){
+                    if (att.child(empid).hasChild("OUT")) {
                         HSSFCell hssfCell4 = hssfRow.createCell(4);
                         hssfCell4.setCellValue(att.child(empid).child("OUT").child("in_time").getValue().toString());
-                    }else {
+                    } else {
                         HSSFCell hssfCell4 = hssfRow.createCell(4);
                         hssfCell4.setCellValue("");
                     }
-                }
-                else {
+                } else {
                     HSSFCell hssfCell1 = hssfRow.createCell(1);
                     hssfCell1.setCellValue(getempname(empid));
 
@@ -278,14 +277,14 @@ public class admin_page extends AppCompatActivity {
         }
 
         try {
-            if (!filePath.exists()){
+            if (!filePath.exists()) {
                 filePath.createNewFile();
             }
 
-            FileOutputStream fileOutputStream= new FileOutputStream(filePath);
+            FileOutputStream fileOutputStream = new FileOutputStream(filePath);
             hssfWorkbook.write(fileOutputStream);
 
-            if (fileOutputStream!=null){
+            if (fileOutputStream != null) {
                 fileOutputStream.flush();
                 fileOutputStream.close();
             }
@@ -296,28 +295,28 @@ public class admin_page extends AppCompatActivity {
         Toast.makeText(this, "File created", Toast.LENGTH_SHORT).show();
     }
 
-    private void createfile(String nm){
-        String fname = "Attendance_"+nm;
-        File file = new File(getExternalFilesDir(null) + "/"+fname+".csv");
+    private void createfile(String nm) {
+        String fname = "Attendance_" + nm;
+        File file = new File(getExternalFilesDir(null) + "/" + fname + ".csv");
 
         CSVWriter writer = null;
         try {
             writer = new CSVWriter(new FileWriter(file.toString()));
 
             List<String[]> data = new ArrayList<String[]>();
-            for(DataSnapshot att: attdata){
-                int c=0;
-                data.add(new String[]{"S.No.", "Employee Name","Employee Code","In Time","Out Time"});
-                for(DataSnapshot at:att.getChildren()){
+            for (DataSnapshot att : attdata) {
+                int c = 0;
+                data.add(new String[]{"S.No.", "Employee Name", "Employee Code", "In Time", "Out Time"});
+                for (DataSnapshot at : att.getChildren()) {
                     String[] n = new String[5];
                     c++;
                     n[0] = String.valueOf(c);
                     n[1] = getempname(at.getKey().toString());
                     n[2] = at.getKey().toString();
                     n[3] = at.child("IN").child("in_time").getValue().toString();
-                    if(at.hasChild("OUT")){
+                    if (at.hasChild("OUT")) {
                         n[4] = at.child("OUT").child("in_time").getValue().toString();
-                    }else {
+                    } else {
                         n[4] = "";
                     }
                     data.add(n);

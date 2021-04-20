@@ -90,7 +90,7 @@
         android:fontFamily="@font/nexa_bold"
         android:gravity="center_horizontal"
         android:padding="10dp"
-        android:text="Add Employee"
+        android:text="Add Project"
         android:textColor="@color/white"
         android:textSize="20dp" />
 
