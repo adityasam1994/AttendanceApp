@@ -46,7 +46,7 @@ import java.util.List;
 public class admin_page extends AppCompatActivity {
 
     ImageView logout;
-    TextView getatt, manageemp, manageproj, managevac;
+    TextView getatt, manageemp, manageproj, managevac, viewatt;
     SharedPreferences sharedPreferences;
     ArrayList<DataSnapshot> attdata = new ArrayList<>();
     KProgressHUD khud;
@@ -78,6 +78,7 @@ public class admin_page extends AppCompatActivity {
         manageemp = (TextView) findViewById(R.id.manageemp);
         manageproj = (TextView) findViewById(R.id.manageproj);
         managevac = (TextView) findViewById(R.id.managevac);
+        viewatt = (TextView)findViewById(R.id.viewatt);
 
         managevac.setOnClickListener(new View.OnClickListener() {
             @Override

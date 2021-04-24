@@ -104,6 +104,23 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/nexa_light"
                 android:text="Sup Name" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="@font/nexa_bold"
+                android:text="Location" />
+
+            <TextView
+                android:id="@+id/location"
+                android:layout_width="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:fontFamily="@font/nexa_light"
+                android:text="Location" />
         </LinearLayout>
 
         <TextView

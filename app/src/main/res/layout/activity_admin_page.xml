@@ -77,6 +77,20 @@
             android:layout_marginTop="30dp"
             android:textColor="@color/white"
             android:textSize="18dp"/>
+
+        <TextView
+            android:id="@+id/viewatt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View Attendance"
+            android:fontFamily="@font/nexa_bold"
+            android:background="@drawable/roundedbtntransit"
+            android:gravity="center"
+            android:padding="10dp"
+            android:elevation="10dp"
+            android:layout_marginTop="30dp"
+            android:textColor="@color/white"
+            android:textSize="18dp"/>
     </LinearLayout>
 
     <LinearLayout

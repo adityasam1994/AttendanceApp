@@ -7,15 +7,24 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Address;
+import android.location.Criteria;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -25,6 +34,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.internal.FallbackServiceBroker;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -35,12 +46,15 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.kaopiz.kprogresshud.KProgressHUD;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
-public class option_page extends AppCompatActivity {
+public class option_page extends AppCompatActivity implements LocationListener {
 
     private static final int REQUEST_CODE_QR_SCAN = 101;
     TextView intime, transout, transin, outtime;
@@ -51,6 +65,9 @@ public class option_page extends AppCompatActivity {
     ArrayList<DataSnapshot> supdata = new ArrayList<>();
     DataSnapshot todaysData = null;
 
+    double lati=0, longi=0;
+    String address="";
+
     ImageView backbtn;
 
     KProgressHUD khud;
@@ -58,6 +75,10 @@ public class option_page extends AppCompatActivity {
     String action = "IN";
 
     SharedPreferences sharedPreferences;
+
+    boolean start = true;
+
+    LocationManager locationManager;
 
     DatabaseReference dbr = FirebaseDatabase.getInstance().getReference("Attendance");
     DatabaseReference dbrprojects = FirebaseDatabase.getInstance().getReference("Projects");
@@ -80,11 +101,9 @@ public class option_page extends AppCompatActivity {
 
         sharedPreferences = getSharedPreferences("user", MODE_PRIVATE);
 
+        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         checkcamera();
         getprojects();
-        //getemployees();
-        //getsups();
-        //gettodaysdata();
 
         intime = (TextView) findViewById(R.id.intime);
         transout = (TextView) findViewById(R.id.tranout);
@@ -209,16 +228,66 @@ public class option_page extends AppCompatActivity {
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             String[] requestloc = new String[]{Manifest.permission.CAMERA};
             requestPermissions(requestloc, REQUEST_LOC_ORDER);
-        }else {
-            startscanner();
+        } else {
+            checkLocation();
         }
+    }
+
+    private void checkLocation() {
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            String[] requesLoc = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+            requestPermissions(requesLoc, 989);
+        } else {
+            if (start == false) {
+                checkIfGPSEnabled();
+                //startscanner();
+            } else {
+                start = false;
+            }
+        }
+    }
+
+    private void checkIfGPSEnabled() {
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(option_page.this);
+            builder.setTitle("GPS Disabled!");
+            builder.setMessage("GPS should be enabled to get your location");
+            builder.setPositiveButton("Enable GPS", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(intent);
+                }
+            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(option_page.this, "Okay", Toast.LENGTH_SHORT).show();
+                }
+            });
+            builder.show();
+        }else {
+            khud.show();
+            startGettingLocation();
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void startGettingLocation() {
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        String provide = locationManager.getBestProvider(criteria, true);
+        locationManager.requestLocationUpdates(provide,5*1000,10,(LocationListener) this);
+
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_LOC_ORDER) {
-            Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Camera permission granted", Toast.LENGTH_SHORT).show();
+        } else if (requestCode == 989) {
+            Toast.makeText(this, "Location permission granted", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -269,7 +338,7 @@ public class option_page extends AppCompatActivity {
                 if (project.equals(project_code)) {
                     String lastdate = empstatus.child("CURRENT_STATUS").child("current_date").getValue().toString();
 
-                    attendanceInTime ait = new attendanceInTime(project_code, gettime(1), sharedPreferences.getString("username", ""));
+                    attendanceInTime ait = new attendanceInTime(project_code, gettime(1), sharedPreferences.getString("username", ""),lati,longi,address);
 
                     dbr.child(lastdate).child(ec).child("OUT").setValue(ait)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -314,7 +383,7 @@ public class option_page extends AppCompatActivity {
 
                 String lastdate = empstatus.child("CURRENT_STATUS").child("current_date").getValue().toString();
 
-                attendanceInTime ait = new attendanceInTime(project_code, gettime(1), sharedPreferences.getString("username", ""));
+                attendanceInTime ait = new attendanceInTime(project_code, gettime(1), sharedPreferences.getString("username", ""),lati,longi,address);
 
                 dbr.child(lastdate).child(ec).child("TRANSIT").child(String.valueOf(lt)).child("IN").setValue(ait)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -354,7 +423,7 @@ public class option_page extends AppCompatActivity {
 
                     String lastdate = empstatus.child("CURRENT_STATUS").child("current_date").getValue().toString();
 
-                    attendanceInTime ait = new attendanceInTime(project_code, gettime(1), sharedPreferences.getString("username", ""));
+                    attendanceInTime ait = new attendanceInTime(project_code, gettime(1), sharedPreferences.getString("username", ""),lati,longi,address);
 
                     dbr.child(lastdate).child(ec).child("TRANSIT").child(String.valueOf(lt)).child("OUT").setValue(ait)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -404,9 +473,14 @@ public class option_page extends AppCompatActivity {
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                Intent intent = getIntent();
-                finish();
-                startActivity(intent);
+//                Intent intent = getIntent();
+//                finish();
+//                startActivity(intent);
+                lati=0;
+                longi=0;
+                address="";
+                getprojects();
+
             }
         });
         dialog.show();
@@ -421,7 +495,9 @@ public class option_page extends AppCompatActivity {
         TextView intime = dialog.findViewById(R.id.time);
         TextView done = dialog.findViewById(R.id.done);
         TextView supname = dialog.findViewById(R.id.supname);
+        TextView loc = dialog.findViewById(R.id.location);
 
+        loc.setText(address);
         projName.setText(getprojectname() + " : " + project_code);
         ename.setText(getempname(ec));
         wcode.setText(ec);
@@ -483,7 +559,7 @@ public class option_page extends AppCompatActivity {
                         String msg = getempname(ec) + " (" + ec + ") has already been signed out for today. Can't sign in today agian";
                         alertpop(msg);
                     } else {
-                        attendanceInTime ait = new attendanceInTime(project_code, tm, sharedPreferences.getString("username", ""));
+                        attendanceInTime ait = new attendanceInTime(project_code, tm, sharedPreferences.getString("username", ""), lati,longi,address);
                         dbr.child(gettime(0)).child(ec).child("IN").setValue(ait)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
@@ -501,7 +577,7 @@ public class option_page extends AppCompatActivity {
                                 });
                     }
                 } else {
-                    attendanceInTime ait = new attendanceInTime(project_code, tm, sharedPreferences.getString("username", ""));
+                    attendanceInTime ait = new attendanceInTime(project_code, tm, sharedPreferences.getString("username", ""),lati,longi,address);
                     dbr.child(gettime(0)).child(ec).child("IN").setValue(ait)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
@@ -593,5 +669,43 @@ public class option_page extends AppCompatActivity {
         }
 
         return c;
+    }
+
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+        double lat = location.getLatitude();
+        double lon = location.getLongitude();
+
+        Geocoder geo = new Geocoder(option_page.this.getApplicationContext(), Locale.getDefault());
+
+        List<Address> addresses = null;
+        try {
+            addresses = geo.getFromLocation(lat,lon, 1);
+            if(!addresses.isEmpty() && addresses != null){
+                lati = lat;
+                longi = lon;
+                address = addresses.get(0).getAddressLine(0);
+                khud.dismiss();
+                startscanner();
+            }
+        } catch (IOException e) {
+            Toast.makeText(this, ""+e, Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onProviderEnabled(@NonNull String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(@NonNull String provider) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
     }
 }
