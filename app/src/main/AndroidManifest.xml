@@ -18,7 +18,8 @@
         android:roundIcon="@mipmap/unicornlogo_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.UnicornAttendance">
-        <activity android:name=".view_attendance"></activity>
+        <activity android:name=".view_attendance"
+            android:windowSoftInputMode="stateHidden"></activity>
         <activity android:name=".leave_history" />
         <activity
             android:name=".vacations"

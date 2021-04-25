@@ -270,7 +270,7 @@ public class vacations extends AppCompatActivity {
                 if (ds.getKey().toString().equals(ec)) {
                     for (DataSnapshot ddd : ds.getChildren()) {
                         String fd = ddd.child("fromdate").getValue().toString();
-                        String td = ddd.child("todate").getKey().toString();
+                        String td = ddd.child("todate").getValue().toString();
                         Date fdd = null, tdd = null;
                         try {
                             fdd = dateFormat.parse(fd);

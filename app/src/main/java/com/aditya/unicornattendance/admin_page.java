@@ -80,6 +80,13 @@ public class admin_page extends AppCompatActivity {
         managevac = (TextView) findViewById(R.id.managevac);
         viewatt = (TextView)findViewById(R.id.viewatt);
 
+        viewatt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(admin_page.this, view_attendance.class));
+            }
+        });
+
         managevac.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
