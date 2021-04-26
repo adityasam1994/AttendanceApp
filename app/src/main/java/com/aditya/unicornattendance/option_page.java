@@ -54,6 +54,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import io.nlopez.smartlocation.OnLocationUpdatedListener;
+import io.nlopez.smartlocation.OnReverseGeocodingListener;
+import io.nlopez.smartlocation.SmartLocation;
+
 public class option_page extends AppCompatActivity implements LocationListener {
 
     private static final int REQUEST_CODE_QR_SCAN = 101;
@@ -252,7 +256,7 @@ public class option_page extends AppCompatActivity implements LocationListener {
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(option_page.this);
             builder.setTitle("GPS Disabled!");
-            builder.setMessage("GPS should be enabled to get your location");
+            builder.setMessage("GPS should be enabled to mark the attendance");
             builder.setPositiveButton("Enable GPS", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -268,6 +272,7 @@ public class option_page extends AppCompatActivity implements LocationListener {
             builder.show();
         }else {
             khud.show();
+            //setgpslocation();
             startGettingLocation();
         }
     }
@@ -278,7 +283,29 @@ public class option_page extends AppCompatActivity implements LocationListener {
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
         String provide = locationManager.getBestProvider(criteria, true);
         locationManager.requestLocationUpdates(provide,5*1000,10,(LocationListener) this);
+        setgpslocation();
+    }
 
+    private void setgpslocation() {
+        SmartLocation.with(option_page.this).location().oneFix().start(new OnLocationUpdatedListener() {
+            @Override
+            public void onLocationUpdated(Location location) {
+                SmartLocation.with(option_page.this).geocoding().reverse(location, new OnReverseGeocodingListener() {
+                    @Override
+                    public void onAddressResolved(Location location, List<Address> list) {
+                        if(list.size() > 0){
+                            lati = location.getLatitude();
+                            longi = location.getLongitude();
+                            address = (list.get(0).getAddressLine(0));
+                            khud.dismiss();
+                            startscanner();
+                        }else {
+                            setgpslocation();
+                        }
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -305,7 +332,7 @@ public class option_page extends AppCompatActivity implements LocationListener {
         IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (intentResult != null) {
             if (intentResult.getContents() == null) {
-                Toast.makeText(this, "No code found", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "No code found", Toast.LENGTH_SHORT).show();
             } else {
                 if (action.equals("IN")) {
                     String ec = intentResult.getContents();
@@ -330,39 +357,44 @@ public class option_page extends AppCompatActivity implements LocationListener {
         khud.show();
         String tm = gettime(1);
         DataSnapshot empstatus = getstatus(ec);
-        if (empstatus.hasChild("CURRENT_STATUS")) {
-            String cc = empstatus.child("CURRENT_STATUS").child("status").getValue().toString();
-            String project = empstatus.child("CURRENT_STATUS").child("project").getValue().toString();
 
-            if (cc.equals("working")) {
-                if (project.equals(project_code)) {
-                    String lastdate = empstatus.child("CURRENT_STATUS").child("current_date").getValue().toString();
+        if (empstatus == null) {
+            alertpop("This employee doesn't exist in the database");
+        } else {
+            if (empstatus.hasChild("CURRENT_STATUS")) {
+                String cc = empstatus.child("CURRENT_STATUS").child("status").getValue().toString();
+                String project = empstatus.child("CURRENT_STATUS").child("project").getValue().toString();
 
-                    attendanceInTime ait = new attendanceInTime(project_code, gettime(1), sharedPreferences.getString("username", ""),lati,longi,address);
+                if (cc.equals("working")) {
+                    if (project.equals(project_code)) {
+                        String lastdate = empstatus.child("CURRENT_STATUS").child("current_date").getValue().toString();
 
-                    dbr.child(lastdate).child(ec).child("OUT").setValue(ait)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    dbremp.child(ec).child("CURRENT_STATUS").removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            createdonedialog(ec, tm);
-                                        }
-                                    });
-                                }
-                            });
+                        attendanceInTime ait = new attendanceInTime(project_code, gettime(1), sharedPreferences.getString("username", ""), lati, longi, address);
+
+                        dbr.child(lastdate).child(ec).child("OUT").setValue(ait)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        dbremp.child(ec).child("CURRENT_STATUS").removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                createdonedialog(ec, tm);
+                                            }
+                                        });
+                                    }
+                                });
+                    }
+                } else if (cc.equals("transit")) {
+                    String msg = "Can't transit " + getempname(ec) + " (" + ec + ") because he is under transit. First take him in";
+                    alertpop(msg);
                 }
-            } else if (cc.equals("transit")) {
-                String msg = "Can't transit " + getempname(ec) + " (" + ec + ") because he is under transit. First take him in";
+            } else {
+                String msg = getempname(ec) + " (" + ec + ") has not signed in yet. First sign in";
                 alertpop(msg);
             }
-        } else {
-            String msg = getempname(ec) + " (" + ec + ") has not signed in yet. First sign in";
-            alertpop(msg);
-        }
 
-        khud.dismiss();
+            khud.dismiss();
+        }
 
     }
 
@@ -371,65 +403,28 @@ public class option_page extends AppCompatActivity implements LocationListener {
         String tm = gettime(1);
         DataSnapshot empstatus = getstatus(ec);
 
-        if (empstatus.hasChild("CURRENT_STATUS")) {
-            String cc = empstatus.child("CURRENT_STATUS").child("status").getValue().toString();
-            String project = empstatus.child("CURRENT_STATUS").child("project").getValue().toString();
-
-            if (cc.equals("working")) {
-                String msg = getempname(ec) + " (" + ec + ") is currently working at " + getprojname_new(project) + ". First transit out from there to take him in";
-                alertpop(msg);
-            } else if (cc.equals("transit")) {
-                int lt = Integer.parseInt(empstatus.child("CURRENT_STATUS").child("transits").getValue().toString());
-
-                String lastdate = empstatus.child("CURRENT_STATUS").child("current_date").getValue().toString();
-
-                attendanceInTime ait = new attendanceInTime(project_code, gettime(1), sharedPreferences.getString("username", ""),lati,longi,address);
-
-                dbr.child(lastdate).child(ec).child("TRANSIT").child(String.valueOf(lt)).child("IN").setValue(ait)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                new_att_in nai = new new_att_in("working", lastdate, project_code, String.valueOf(lt));
-                                dbremp.child(ec).child("CURRENT_STATUS").setValue(nai)
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                createdonedialog(ec, tm);
-                                            }
-                                        });
-                            }
-                        });
-            }
+        if (empstatus == null) {
+            alertpop("This employee doesn't exist in the database");
         } else {
-            String msg = getempname(ec) + " (" + ec + ") has not signed in yet hence cannot be taken in";
-            alertpop(msg);
-        }
+            if (empstatus.hasChild("CURRENT_STATUS")) {
+                String cc = empstatus.child("CURRENT_STATUS").child("status").getValue().toString();
+                String project = empstatus.child("CURRENT_STATUS").child("project").getValue().toString();
 
-        khud.dismiss();
-    }
-
-    private void mark_transout(String ec) {
-        khud.show();
-        String tm = gettime(1);
-        DataSnapshot empstatus = getstatus(ec);
-
-        if (empstatus.hasChild("CURRENT_STATUS")) {
-            String cc = empstatus.child("CURRENT_STATUS").child("status").getValue().toString();
-            String project = empstatus.child("CURRENT_STATUS").child("project").getValue().toString();
-
-            if (cc.equals("working")) {
-                if (project.equals(project_code)) {
-                    int lt = Integer.parseInt(empstatus.child("CURRENT_STATUS").child("transits").getValue().toString()) + 1;
+                if (cc.equals("working")) {
+                    String msg = getempname(ec) + " (" + ec + ") is currently working at " + getprojname_new(project) + ". First transit out from there to take him in";
+                    alertpop(msg);
+                } else if (cc.equals("transit")) {
+                    int lt = Integer.parseInt(empstatus.child("CURRENT_STATUS").child("transits").getValue().toString());
 
                     String lastdate = empstatus.child("CURRENT_STATUS").child("current_date").getValue().toString();
 
-                    attendanceInTime ait = new attendanceInTime(project_code, gettime(1), sharedPreferences.getString("username", ""),lati,longi,address);
+                    attendanceInTime ait = new attendanceInTime(project_code, gettime(1), sharedPreferences.getString("username", ""), lati, longi, address);
 
-                    dbr.child(lastdate).child(ec).child("TRANSIT").child(String.valueOf(lt)).child("OUT").setValue(ait)
+                    dbr.child(lastdate).child(ec).child("TRANSIT").child(String.valueOf(lt)).child("IN").setValue(ait)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
-                                    new_att_in nai = new new_att_in("transit", lastdate, project_code, String.valueOf(lt));
+                                    new_att_in nai = new new_att_in("working", lastdate, project_code, String.valueOf(lt));
                                     dbremp.child(ec).child("CURRENT_STATUS").setValue(nai)
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
@@ -439,20 +434,65 @@ public class option_page extends AppCompatActivity implements LocationListener {
                                             });
                                 }
                             });
-                } else {
-                    String msg = "Can't transit out from this project because " + getempname(ec) + " (" + ec + ") signed in to " + getprojname_new(project);
-                    alertpop(msg);
                 }
-            } else if (cc.equals("transit")) {
-                String msg = getempname(ec) + " (" + ec + ") is already in transit from " + getprojname_new(project);
+            } else {
+                String msg = getempname(ec) + " (" + ec + ") has not signed in yet hence cannot be taken in";
                 alertpop(msg);
             }
-        } else {
-            String msg = getempname(ec) + " (" + ec + ") has not signed in. First sign in to transit out";
-            alertpop(msg);
-        }
 
-        khud.dismiss();
+            khud.dismiss();
+        }
+    }
+
+    private void mark_transout(String ec) {
+        khud.show();
+        String tm = gettime(1);
+        DataSnapshot empstatus = getstatus(ec);
+
+        if (empstatus == null) {
+            alertpop("This employee doesn't exist in the database");
+        } else {
+            if (empstatus.hasChild("CURRENT_STATUS")) {
+                String cc = empstatus.child("CURRENT_STATUS").child("status").getValue().toString();
+                String project = empstatus.child("CURRENT_STATUS").child("project").getValue().toString();
+
+                if (cc.equals("working")) {
+                    if (project.equals(project_code)) {
+                        int lt = Integer.parseInt(empstatus.child("CURRENT_STATUS").child("transits").getValue().toString()) + 1;
+
+                        String lastdate = empstatus.child("CURRENT_STATUS").child("current_date").getValue().toString();
+
+                        attendanceInTime ait = new attendanceInTime(project_code, gettime(1), sharedPreferences.getString("username", ""), lati, longi, address);
+
+                        dbr.child(lastdate).child(ec).child("TRANSIT").child(String.valueOf(lt)).child("OUT").setValue(ait)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        new_att_in nai = new new_att_in("transit", lastdate, project_code, String.valueOf(lt));
+                                        dbremp.child(ec).child("CURRENT_STATUS").setValue(nai)
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        createdonedialog(ec, tm);
+                                                    }
+                                                });
+                                    }
+                                });
+                    } else {
+                        String msg = "Can't transit out from this project because " + getempname(ec) + " (" + ec + ") signed in to " + getprojname_new(project);
+                        alertpop(msg);
+                    }
+                } else if (cc.equals("transit")) {
+                    String msg = getempname(ec) + " (" + ec + ") is already in transit from " + getprojname_new(project);
+                    alertpop(msg);
+                }
+            } else {
+                String msg = getempname(ec) + " (" + ec + ") has not signed in. First sign in to transit out";
+                alertpop(msg);
+            }
+
+            khud.dismiss();
+        }
     }
 
     private String getprojname_new(String code) {
@@ -685,8 +725,8 @@ public class option_page extends AppCompatActivity implements LocationListener {
                 lati = lat;
                 longi = lon;
                 address = addresses.get(0).getAddressLine(0);
-                khud.dismiss();
-                startscanner();
+                //khud.dismiss();
+                //startscanner();
             }
         } catch (IOException e) {
             Toast.makeText(this, ""+e, Toast.LENGTH_SHORT).show();

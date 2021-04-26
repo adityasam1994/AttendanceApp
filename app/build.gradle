@@ -41,7 +41,7 @@ dependencies {
     implementation 'com.opencsv:opencsv:5.3'
     implementation 'com.kaopiz:kprogresshud:1.2.0'
     implementation 'com.github.Binary-Finery:Bungee:3.0'
-    //implementation 'com.google.android.gms:play-services:12.0.1'
+    implementation 'io.nlopez.smartlocation:library:3.3.3'
     implementation 'com.google.android.gms:play-services-location:15.0.1'
     implementation files('libs\\poi-3.7.jar')
     testImplementation 'junit:junit:4.+'
